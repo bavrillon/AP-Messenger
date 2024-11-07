@@ -1,18 +1,1 @@
-server = {
-    "users": [
-        {"id": 1, "name": "Alice"},
-        {"id": 2, "name": "Bob"}
-    ],
-    "channels": [
-        {"id": 1, "name": "Town square", "member_ids": [1, 2]}
-    ],
-    "messages": [
-        {
-            "id": 1,
-            "reception_date": datetime.now(),
-            "sender_id": 1,
-            "channel": 1,
-            "content": "Hi :)"
-        }
-    ]
-}
+{"users": [{"id": 1, "name": "Alice"}, {"id": 2, "name": "Bob"}, {"id": 3, "name": "Honor\u00c3\u00a9"}, {"id": 4, "name": "Bastien"}, {"id": 5, "name": "Quentin"}], "channels": [{"id": 1, "name": "Town square", "member_ids": [1, 2]}, {"id": 3, "name": "Groupe de classe", "member_ids": ["1", "2", "4"]}], "messages": [{"id": 1, "reception_date": "2024-11-07 10:35:49.776882", "sender_id": 1, "channel": 1, "content": "Hi :)"}]}
