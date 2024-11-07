@@ -1,24 +1,12 @@
 from datetime import datetime
+import json
 
-server = {
-    'users': [
-        {'id': 1, 'name': 'Alice'},
-        {'id': 2, 'name': 'Bob'}
-    ],
-    'channels': [
-        {'id': 1, 'name': 'Town square', 'member_ids': [1, 2]}
-    ],
-    'messages': [
-        {
-            'id': 1,
-            'reception_date': datetime.now(),
-            'sender_id': 1,
-            'channel': 1,
-            'content': 'Hi '
-        }
-    ]
-}
+with open("server.json", "r") as f:
+    server = json.load(f)
 
+def sauvegarde_json() :
+    with open("server.json", "w") as f:
+        json.dump(server, f)
 
 def creation_liste_user():
     mb1 = input('ID of the first user belonging to the new channel: ')
@@ -35,9 +23,13 @@ def creation_liste_user():
             choice = input('Add a member (yes/no) ? : ')
     return(members)
 
-def create_user(name):
-    n = max([user['id'] for user in server['users']])+1
-    server['users'].append({'id':(n+1), 'name':name})
+def create_user(names):
+    new_users_names_draft = names.split(',')
+    new_users_names = [name.strip() for name in new_users_names_draft]
+    for elem in new_users_names :
+        n = max([user['id'] for user in server['users']])+1
+        server['users'].append({'id':(n), 'name':elem})
+    sauvegarde_json()
 
 def create_channel():
     channel = input('Name of the new channel: ')
@@ -45,6 +37,7 @@ def create_channel():
     n = max([channel['id'] for channel in server['channels']])+1
     server['channels'].append({'id':(n+1), 'name':channel, 'member_ids':members})
     print('The new channel have successfully been created !')
+    sauvegarde_json()
     main_menu()
 
 def display_users():
@@ -54,8 +47,8 @@ def display_users():
     print('\nn. Create user\nx. Main menu')
     ch = input('Select an option: ')
     if ch == 'n':
-        name = input('Name of the new user: ')
-        create_user(name)
+        names = input('Name of the new users (separators = ,) : ')
+        create_user(names)
         main_menu()
     elif ch == 'x':
         main_menu()
@@ -67,7 +60,7 @@ def display_messages():
     print('\nMessages of the channel\n-------')
     for elem in server['messages'] :
         if elem['channel'] == channel :
-            print(elem['id'],' -\nReception date : ',elem['reception_date'],' -\nsender id : ',elem['sender_id'],'\n',elem['content'])
+    #       print(elem['id'],' -\nReception date : ',elem['reception_date'],' -\nsender id : ',elem['sender_id'],'\n',elem['content'])
             print(f"{elem['id']} -\nReception date : {elem['reception_date']}\nsender id : {elem['sender_id']}\n{elem['content']}")
     print('x. Main menu')
     ch = input('Select an option: ')
