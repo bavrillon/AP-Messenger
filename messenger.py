@@ -9,19 +9,20 @@ def sauvegarde_json() :
         json.dump(server, f)
 
 def creation_liste_user():
-    mb1 = input('ID of the first user belonging to the new channel: ')
-    members = [mb1]
-    choice = input('Add a member (yes/no) ? : ')
-    if (choice != 'yes' and choice != 'no'):
-            print('Unknown option:', choice)
-            choice = input('Add a member (yes/no) ? : ')
-    while choice != 'no':
-        members.append(input('ID of the next user belonging to the new channel: '))
+    first_member_id = int(input('ID of the first user belonging to the new channel: '))
+    member_ids = [first_member_id]
+    while True:
         choice = input('Add a member (yes/no) ? : ')
-        if (choice != 'yes' and choice != 'no'):
+        if choice == 'no':
+            break
+        # Les 4 lignes ci-dessus peuvent être remplacées par :
+        # while (choice := input('Add a member (yes/no) ? : ')) != 'no':
+        elif choice != 'yes':
             print('Unknown option:', choice)
-            choice = input('Add a member (yes/no) ? : ')
-    return(members)
+            continue
+        member_ids.append(int(input('ID of the next user belonging to the new channel: ')))
+
+    return member_ids
 
 def create_user(names):
     new_users_names_draft = names.split(',')
