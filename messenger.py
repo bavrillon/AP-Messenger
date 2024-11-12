@@ -1,16 +1,18 @@
 from datetime import datetime
 import json
 
-with open("server.json", "r") as f:
+JASON_FILE_NAME = 'server.json'
+
+with open(JASON_FILE_NAME, "r") as f:
     server = json.load(f)
 
 def sauvegarde_json() :
-    with open("server.json", "w") as f:
+    with open(JASON_FILE_NAME, "w") as f:
         json.dump(server, f)
 
 def creation_liste_user():
-    mb1 = input('ID of the first user belonging to the new channel: ')
-    members = [mb1]
+    member_1 = input('ID of the first user belonging to the new channel: ')
+    members = [member_1]
     choice = input('Add a member (yes/no) ? : ')
     if (choice != 'yes' and choice != 'no'):
             print('Unknown option:', choice)
@@ -26,9 +28,9 @@ def creation_liste_user():
 def create_user(names):
     new_users_names_draft = names.split(',')
     new_users_names = [name.strip() for name in new_users_names_draft]
-    for elem in new_users_names :
+    for name_user in new_users_names :
         n = max([user['id'] for user in server['users']])+1
-        server['users'].append({'id':(n), 'name':elem})
+        server['users'].append({'id':(n), 'name':name_user})
     sauvegarde_json()
 
 def create_channel():
@@ -42,45 +44,45 @@ def create_channel():
 
 def display_users():
     print('\nUser list\n-------')
-    for elem in server['users'] :
-        print(elem['id'],' - ',elem['name'])
+    for user in server['users'] :
+        print(user['id'],' - ',user['name'])
     print('\nn. Create user\nx. Main menu')
-    ch = input('Select an option: ')
-    if ch == 'n':
+    choice = input('Select an option: ')
+    if choice == 'n':
         names = input('Name of the new users (separators = ,) : ')
         create_user(names)
         main_menu()
-    elif ch == 'x':
+    elif choice == 'x':
         main_menu()
     else:
-        print('Unknown option:', ch)
+        print('Unknown option:', choice)
 
 def display_messages():
     channel = int(input('Name of the channel: '))
     print('\nMessages of the channel\n-------')
-    for elem in server['messages'] :
-        if elem['channel'] == channel :
-    #       print(elem['id'],' -\nReception date : ',elem['reception_date'],' -\nsender id : ',elem['sender_id'],'\n',elem['content'])
-            print(f"{elem['id']} -\nReception date : {elem['reception_date']}\nsender id : {elem['sender_id']}\n{elem['content']}")
+    for message in server['messages'] :
+        if message['channel'] == channel :
+    #       print(message['id'],' -\nReception date : ',message['reception_date'],' -\nsender id : ',message['sender_id'],'\n',message['content'])
+            print(f"{message['id']} -\nReception date : {message['reception_date']}\nsender id : {message['sender_id']}\n{message['content']}")
     print('x. Main menu')
-    ch = input('Select an option: ')
-    if ch == 'x':
+    choice = input('Select an option: ')
+    if choice == 'x':
         main_menu()
     else:
-        print('Unknown option:', ch)
+        print('Unknown option:', choice)
 
 def display_channels():
     print('\nChannels list\n-------')
-    for elem in server['channels'] :
-        print(f"{elem['id']} - {elem['name']} : {elem['member_ids']}")
+    for channel in server['channels'] :
+        print(f"{channel['id']} - {channel['name']} : {channel['member_ids']}")
     print('\nn. Create channel\nx. Main menu')
-    ch = input('Select an option: ')
-    if ch == 'n':
+    choice = input('Select an option: ')
+    if choice == 'n':
         create_channel()
-    elif ch == 'x':
+    elif choice == 'x':
         main_menu()
     else:
-        print('Unknown option:', ch)
+        print('Unknown option:', choice)
 
 def main_menu():
     print('\n1. See users\n2. See channels\n3. See messages\nx. Leave')
