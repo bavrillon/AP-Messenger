@@ -3,12 +3,18 @@ import json
 
 JASON_FILE_NAME = 'server.json'
 
-with open(JASON_FILE_NAME, "r") as f:
-    server = json.load(f)
+def ouverture_json(file) :
+    with open(file, "r") as f:
+        server = json.load(f)
+    return(server)
 
-def sauvegarde_json() :
-    with open(JASON_FILE_NAME, "w") as f:
-        json.dump(server, f)
+
+def sauvegarde_json(file,new_content) :
+    with open(file, "w") as f:
+        json.dump(new_content, f)
+
+
+server = ouverture_json(JASON_FILE_NAME)
 
 def creation_liste_user():
     first_member_id = int(input('ID of the first user belonging to the new channel: '))
@@ -32,7 +38,7 @@ def create_user(names):
     for name_user in new_users_names :
         n = max([user['id'] for user in server['users']])+1
         server['users'].append({'id':(n), 'name':name_user})
-    sauvegarde_json()
+    sauvegarde_json(JASON_FILE_NAME,server)
 
 def create_channel():
     channel = input('Name of the new channel: ')
@@ -40,7 +46,7 @@ def create_channel():
     n = max([channel['id'] for channel in server['channels']])+1
     server['channels'].append({'id':(n+1), 'name':channel, 'member_ids':members})
     print('The new channel have successfully been created !')
-    sauvegarde_json()
+    sauvegarde_json(JASON_FILE_NAME,server)
     main_menu()
 
 def display_users():
@@ -98,6 +104,9 @@ def main_menu():
         display_messages()
     else:
         print('Unknown option:', choice)
+
+
+
 
 
 print('=== Messenger ===')
