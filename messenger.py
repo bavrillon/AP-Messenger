@@ -6,27 +6,36 @@ class User :
         self.id = id
         self.name = name
 
-    def from_dico(user_dico:dict):
-        user_User = User(user_dico['id'],user_dico['name'])
-        return(user_User)
-    
+    def __repr__(self):
+        return(f'User(id={self.id},name={self.name})')
+  
     def to_dico(self):
         user_dico = {"id": self.id, "name": self.name}
         return(user_dico)
+    
+    @classmethod
+    def from_dico(cls,user_dico:dict):
+        user_User = cls(user_dico['id'],user_dico['name'])
+        return(user_User)
+    
 
 class Channel :
     def __init__(self,id:int,name:str,members_ids:list):
         self.id = id
         self.name = name
         self.members_ids = members_ids
-
-    def from_dico(channel_dico:dict):
-        channel_Channel = Channel(channel_dico['id'],channel_dico['name'],channel_dico['member_ids'])
-        return(channel_Channel)
     
+    def __repr__(self):
+        return(f'Channel(id={self.id},name={self.name},members_ids={self.members_ids})')
+  
     def to_dico(self):
         channel_dico = {"id": self.id, "name": self.name, "member_ids": self.members_ids}
         return(channel_dico)
+    
+    @classmethod
+    def from_dico(cls,channel_dico:dict):
+        channel_Channel = cls(channel_dico['id'],channel_dico['name'],channel_dico['member_ids'])
+        return(channel_Channel)
 
 class Message :
     def __init__(self,id:int,reception_date:str,sender_id:str,channel:str,content:str):
@@ -35,43 +44,52 @@ class Message :
         self.sender_id = sender_id
         self.channel = channel
         self.content = content
-    
-    def from_dico(message_dico:dict):
-        message_Message = Message(message_dico['id'],message_dico['reception_date'],message_dico['sender_id'],message_dico['channel'],message_dico['content'])
-        return(message_Message)
+        
+    def __repr__(self):
+        return(f'Message(id={self.id},reception_date={self.reception_date},sender_id={self.sender_id},channel={self.channel},content={self.content})')
     
     def to_dico(self):
         message_dico = {"id": self.id, "reception_date": self.reception_date, "sender_id": self.sender_id, "channel": self.channel, "content": self.content}
         return(message_dico)
+    
+    @classmethod
+    def from_dico(cls,message_dico:dict):
+        message_Message = cls(message_dico['id'],message_dico['reception_date'],message_dico['sender_id'],message_dico['channel'],message_dico['content'])
+        return(message_Message)
     
 class Server :
     def __init__(self,users:'list[User]',channels:'list[Channel]',messages:'list[Message]'):
         self.users = users
         self.channels = channels
         self.messages = messages
-
-    def from_dico(server_dico:dict) :
-        server_Server = Server([User.from_dico(user_dico) for user_dico in server_dico['users']],[Channel.from_dico(channel_dico) for channel_dico in server_dico['channels']],[Message.from_dico(message_dico) for message_dico in server_dico['messages']])
-        return(server_Server)
+    
+    def __repr__(self):
+        return(f'Server(users={self.users},channels={self.channels},messages={self.messages})')
 
     def to_dico(self) ->dict:
         server_dico = {"users": [user_User.to_dico() for user_User in self.users],"channels": [channel_Channel.to_dico() for channel_Channel in self.channels],"messages": [message_Message.to_dico() for message_Message in self.messages]}
         return(server_dico)
     
+    def save(self,file):
+        server_dico = {"users": [user_User.to_dico() for user_User in self.users],"channels": [channel_Channel.to_dico() for channel_Channel in self.channels],"messages": [message_Message.to_dico() for message_Message in self.messages]}
+        with open(file, "w") as f:
+            json.dump(server_dico, f)
+
+    @classmethod
+    def load(cls, file):
+        with open(file, "r") as f:
+            server_dico = json.load(f)
+        server_Server = cls([User.from_dico(user_dico) for user_dico in server_dico['users']],[Channel.from_dico(channel_dico) for channel_dico in server_dico['channels']],[Message.from_dico(message_dico) for message_dico in server_dico['messages']])
+        return(server_Server)
+    
+    @classmethod
+    def from_dico(cls,server_dico:dict) :
+        server_Server = cls([User.from_dico(user_dico) for user_dico in server_dico['users']],[Channel.from_dico(channel_dico) for channel_dico in server_dico['channels']],[Message.from_dico(message_dico) for message_dico in server_dico['messages']])
+        return(server_Server)
 
 JASON_FILE_NAME = 'server.json'
 
-def ouverture_json(file) ->dict :
-    with open(file, "r") as f:
-        server = json.load(f)
-    return(server)
-
-def sauvegarde_json(file,new_content) :
-    with open(file, "w") as f:
-        json.dump(new_content, f)
-
-server_dico = ouverture_json(JASON_FILE_NAME)
-server = Server.from_dico(server_dico)
+server = Server.load(JASON_FILE_NAME)
 
 def creation_liste_user():
     first_member_id = int(input('ID of the first user belonging to the new channel: '))
@@ -92,7 +110,7 @@ def create_user(names):
     for name_user in new_users_names :
         n = max([user.id for user in server.users])+1
         server.users.append(User(n,name_user))
-    sauvegarde_json(JASON_FILE_NAME,server.to_dico())
+    server.save(JASON_FILE_NAME)
 
 def create_channel():
     channel = input('Name of the new channel: ')
@@ -100,7 +118,7 @@ def create_channel():
     n = max([channel.id for channel in server.channels])+1
     server.channels.append(Channel(n+1,channel,members))
     print('The new channel have successfully been created !')
-    sauvegarde_json(JASON_FILE_NAME,server.to_dico())
+    server.save(JASON_FILE_NAME)
     main_menu()
 
 def display_users():
@@ -165,3 +183,6 @@ def main_menu():
 
 print('=== Messenger ===')
 main_menu()
+
+
+
