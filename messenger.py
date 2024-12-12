@@ -1,6 +1,13 @@
 from datetime import datetime
 import json
 
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--server', help = 'enter json server path')
+args = parser.parse_args()
+print(f'Server json : {args.server}')
+
 class User :
     def __init__(self,id:int,name:str):
         self.id = id
