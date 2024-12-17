@@ -1,12 +1,6 @@
 from datetime import datetime
 import json
-
 import argparse
-
-parser = argparse.ArgumentParser()
-parser.add_argument('--server', help = 'enter json server path')
-args = parser.parse_args()
-print(f'Server json : {args.server}')
 
 class User :
     def __init__(self,id:int,name:str):
@@ -200,12 +194,14 @@ class Client :          #Messenger app
         else:
             print('Unknown option:', choice)
     
+parser = argparse.ArgumentParser()
+parser.add_argument('-s','--server', help = 'Enter json server path')
+args = parser.parse_args()
+print(f'Server json : {args.server}')
 
-JASON_FILE_NAME = 'server.json'
+JASON_FILE_NAME = args.server
 server = Server.load(JASON_FILE_NAME)
 client = Client(server)
 
 client.main_menu()
-
-
-
+  
