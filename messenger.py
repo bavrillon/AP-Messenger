@@ -1,7 +1,8 @@
 from datetime import datetime
+import time
 import json
 import argparse
-import sys
+import psutil
 import os
 
 class User :
@@ -153,6 +154,8 @@ class Client :          #Messenger app
             self.main_menu()
         else:
             print('Unknown option:', choice)
+            time.sleep(0.8)
+            self.display_users()
 
     def display_messages(self):
         self.clear_screen()
@@ -165,9 +168,11 @@ class Client :          #Messenger app
         print('x. Main menu')
         choice = input('Select an option: ')
         if choice == 'x':
-            self.main_menu()
+            self.display_messages()
         else:
             print('Unknown option:', choice)
+            time.sleep(0.8)
+            self.main_menu()
 
     def display_channels(self):
         self.clear_screen()
@@ -183,6 +188,8 @@ class Client :          #Messenger app
             self.main_menu()
         else:
             print('Unknown option:', choice)
+            time.sleep(0.8)
+            self.display_channels()
     
     def main_menu(self):
         self.clear_screen()
@@ -199,9 +206,13 @@ class Client :          #Messenger app
             self.display_messages()
         else:
             print('Unknown option:', choice)
+            time.sleep(0.8)
+            self.main_menu()
     
     def clear_screen(self):
-        os.system('cls' if os.name == 'nt' else 'clear') # la commande pour effacer est `cls` sous Windows et `clear` sur presque tout le reste
+        if psutil.Process(os.getppid()).name() == 'bash.exe':
+            os.system('clear')
+        os.system('cls' if os.name == 'nt' else 'clear')
     
 parser = argparse.ArgumentParser()
 parser.add_argument('-s','--server', help = 'Enter json server path')
