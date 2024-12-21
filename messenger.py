@@ -1,6 +1,8 @@
 from datetime import datetime
 import json
 import argparse
+import sys
+import os
 
 class User :
     def __init__(self,id:int,name:str):
@@ -133,6 +135,7 @@ class Client :          #Messenger app
         return(f'Client(server={self.server})')
     
     def display_users(self):
+        self.clear_screen()
         print('\nUser list\n-------')
         for user in self.server.users :
             print(user.id,' - ',user.name)
@@ -152,6 +155,7 @@ class Client :          #Messenger app
             print('Unknown option:', choice)
 
     def display_messages(self):
+        self.clear_screen()
         channel = int(input('Name of the channel: '))
         print('\nMessages of the channel\n-------')
         for message in self.server.messages :
@@ -166,6 +170,7 @@ class Client :          #Messenger app
             print('Unknown option:', choice)
 
     def display_channels(self):
+        self.clear_screen()
         print('\nChannels list\n-------')
         for channel in self.server.channels :
             print(f"{channel.id} - {channel.name} : {channel.members_ids}")
@@ -180,6 +185,7 @@ class Client :          #Messenger app
             print('Unknown option:', choice)
     
     def main_menu(self):
+        self.clear_screen()
         print('=== Messenger ===')
         print('\n1. See users\n2. See channels\n3. See messages\nx. Leave')
         choice = input('Select an option: ')
@@ -194,6 +200,9 @@ class Client :          #Messenger app
         else:
             print('Unknown option:', choice)
     
+    def clear_screen(self):
+        os.system('cls' if os.name == 'nt' else 'clear') # la commande pour effacer est `cls` sous Windows et `clear` sur presque tout le reste
+    
 parser = argparse.ArgumentParser()
 parser.add_argument('-s','--server', help = 'Enter json server path')
 args = parser.parse_args()
@@ -203,5 +212,4 @@ JASON_FILE_NAME = args.server
 server = Server.load(JASON_FILE_NAME)
 client = Client(server)
 
-client.main_menu()
-  
+client.main_menu()  
