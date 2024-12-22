@@ -212,7 +212,8 @@ class Client :          #Messenger app
     def clear_screen(self):
         if psutil.Process(os.getppid()).name() == 'bash.exe':
             os.system('clear')
-        os.system('cls' if os.name == 'nt' else 'clear')
+        else :
+            os.system('cls' if os.name == 'nt' else 'clear')
     
 parser = argparse.ArgumentParser()
 parser.add_argument('-s','--server', help = 'Enter json server path')
