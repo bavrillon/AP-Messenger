@@ -17,9 +17,9 @@ class User :
         user_dico = {"id": self.id, "name": self.name}
         return(user_dico)
     
-    @classmethod
-    def from_dico(cls,user_dico:dict):
-        user_User = cls(user_dico['id'],user_dico['name'])
+    @staticmethod
+    def from_dico(user_dico:dict):
+        user_User = User(user_dico['id'],user_dico['name'])
         return(user_User)
     
 
@@ -36,9 +36,9 @@ class Channel :
         channel_dico = {"id": self.id, "name": self.name, "member_ids": self.members_ids}
         return(channel_dico)
     
-    @classmethod
-    def from_dico(cls,channel_dico:dict):
-        channel_Channel = cls(channel_dico['id'],channel_dico['name'],channel_dico['member_ids'])
+    @staticmethod
+    def from_dico(channel_dico:dict):
+        channel_Channel = Channel(channel_dico['id'],channel_dico['name'],channel_dico['member_ids'])
         return(channel_Channel)
 
 class Message :
@@ -56,9 +56,9 @@ class Message :
         message_dico = {"id": self.id, "reception_date": self.reception_date, "sender_id": self.sender_id, "channel": self.channel, "content": self.content}
         return(message_dico)
     
-    @classmethod
-    def from_dico(cls,message_dico:dict):
-        message_Message = cls(message_dico['id'],message_dico['reception_date'],message_dico['sender_id'],message_dico['channel'],message_dico['content'])
+    @staticmethod
+    def from_dico(message_dico:dict):
+        message_Message = Message(message_dico['id'],message_dico['reception_date'],message_dico['sender_id'],message_dico['channel'],message_dico['content'])
         return(message_Message)
     
 class Server :
@@ -116,16 +116,16 @@ class Server :
         print('\033[33mThe new channel have successfully been created !\033[0m')
         self.save(JASON_FILE_NAME)
 
-    @classmethod
-    def load(cls, file):
+    @staticmethod
+    def load(file):
         with open(file, "r") as f:
             server_dico = json.load(f)
-        server_Server = cls([User.from_dico(user_dico) for user_dico in server_dico['users']],[Channel.from_dico(channel_dico) for channel_dico in server_dico['channels']],[Message.from_dico(message_dico) for message_dico in server_dico['messages']])
+        server_Server = Server([User.from_dico(user_dico) for user_dico in server_dico['users']],[Channel.from_dico(channel_dico) for channel_dico in server_dico['channels']],[Message.from_dico(message_dico) for message_dico in server_dico['messages']])
         return(server_Server)
     
-    @classmethod
-    def from_dico(cls,server_dico:dict) :
-        server_Server = cls([User.from_dico(user_dico) for user_dico in server_dico['users']],[Channel.from_dico(channel_dico) for channel_dico in server_dico['channels']],[Message.from_dico(message_dico) for message_dico in server_dico['messages']])
+    @staticmethod
+    def from_dico(server_dico:dict) :
+        server_Server = Server([User.from_dico(user_dico) for user_dico in server_dico['users']],[Channel.from_dico(channel_dico) for channel_dico in server_dico['channels']],[Message.from_dico(message_dico) for message_dico in server_dico['messages']])
         return(server_Server)
 
 class Client :          #Messenger app
@@ -202,7 +202,7 @@ class Client :          #Messenger app
             self.display_users()
         elif choice == '2':
             self.display_channels()
-        elif choice == '3':
+        elif choice == '3': 
             self.display_messages()
         else:
             print('\033[33mUnknown option:\033[0m', choice)
