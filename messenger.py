@@ -2,7 +2,7 @@ from datetime import datetime
 import time
 import json
 import argparse
-#import psutil
+import psutil
 import os
 
 class User :
@@ -136,7 +136,7 @@ class Client :          #Messenger app
         return(f'Client(server={self.server})')
     
     def display_users(self):
-#        self.clear_screen()
+        self.clear_screen()
         print('\033[33m\nUser list\n-------')
         for user in self.server.users :
             print(user.id,' - ',user.name)
@@ -158,7 +158,7 @@ class Client :          #Messenger app
             self.display_users()
 
     def display_messages(self):
-#        self.clear_screen()
+        self.clear_screen()
         channel = int(input('\033[33mName of the channel: \033[0m'))
         print('\033[31m\nMessages of the channel\n-------')
         for message in self.server.messages :
@@ -175,7 +175,7 @@ class Client :          #Messenger app
             self.main_menu()
 
     def display_channels(self):
-#        self.clear_screen()
+        self.clear_screen()
         print('\033[33m\nChannels list\n-------')
         for channel in self.server.channels :
             print(f"{channel.id} - {channel.name} : {channel.members_ids}")
@@ -192,7 +192,7 @@ class Client :          #Messenger app
             self.display_channels()
     
     def main_menu(self):
-#        self.clear_screen()
+        self.clear_screen()
         print('\033[33m=== Messenger ===')
         print('\n1. See users\n2. See channels\n3. See messages\nx. Leave')
         choice = input('Select an option: \033[0m')
@@ -209,11 +209,11 @@ class Client :          #Messenger app
             time.sleep(0.8)
             self.main_menu()
     
-#    def clear_screen(self):
-#        if psutil.Process(os.getppid()).name() == 'bash.exe':
-#            os.system('clear')
-#        else :
-#            os.system('cls' if os.name == 'nt' else 'clear')
+    def clear_screen(self):
+        if psutil.Process(os.getppid()).name() == 'bash.exe':
+            os.system('clear')
+        else :
+            os.system('cls' if os.name == 'nt' else 'clear')
     
 parser = argparse.ArgumentParser()
 parser.add_argument('-s','--server', help = 'Enter json server path')
