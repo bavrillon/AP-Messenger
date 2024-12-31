@@ -19,13 +19,14 @@ class Client :          #Messenger app
         if choice == 'n':
             new_names = input('\033[33mName of the new users (separators = ,) : \033[0m')
             self.server.create_user(new_names)
-            self.main_menu()
+            self.display_users()
         elif choice == 'x':
             self.main_menu()
         elif choice == 'b':
             banned_id = input('\033[33mID of the banned users (separators = ,) : \033[0m')
             self.server.ban_user(banned_id)
-            self.main_menu()
+            time.sleep(0.8)
+            self.display_users()
         else:
             print('\033[33mUnknown option:\033[0m', choice)
             time.sleep(0.8)
@@ -33,15 +34,21 @@ class Client :          #Messenger app
 
     def display_messages(self):
         self.clear_screen()
-        channel_ID = int(input('\033[33mID of the channel: \033[0m'))
+        channel_ID = input('\033[33mID of the channel: \033[0m')
+        if not(channel_ID.strip().isdigit()) or not(int(channel_ID.strip()) in [channel.id for channel in self.server.channels]):
+                print('\033[33mUnknown option:\033[0m', channel_ID)
+                time.sleep(0.8)
+                self.display_messages()
         print('\033[31m\nMessages of the channel\n-------')
         for message in self.server.messages :
-            if message.channel == channel_ID :
+            if message.channel == int(channel_ID) :
         #       print(message.id',' -\nReception date : ',message.reception_date,' -\nsender id : ',message.sender_id,'\n',message.content)
                 print(f"{message.id} -\nReception date : {message.reception_date}\nsender id : {message.sender_id}\n{message.content}")
-        print('\033[33mx. Main menu')
+        print('\033[33mo. See another channel\nx. Main menu')
         choice = input('Select an option: \033[0m')
-        if choice == 'x':
+        if choice == 'o':
+            self.display_messages()
+        elif choice == 'x':
             self.main_menu()
         else:
             print('Unknown option:\033[0m', choice)
@@ -53,11 +60,16 @@ class Client :          #Messenger app
         print('\033[33m\nChannels list\n-------')
         for channel in self.server.channels :
             print(f"{channel.id} - {channel.name} : {channel.members_ids}")
-        print('\nn. Create channel\nx. Main menu')
+        print('\nn. Create channel\nd. Delete channel\nx. Main menu')
         choice = input('Select an option: \033[0m')
         if choice == 'n':
             self.server.create_channel()
-            self.main_menu()
+            time.sleep(0.8)
+            self.display_channels()
+        if choice == 'd':
+            self.server.delete_channel()
+            time.sleep(0.8)
+            self.display_channels()
         elif choice == 'x':
             self.main_menu()
         else:
@@ -72,6 +84,7 @@ class Client :          #Messenger app
         choice = input('Select an option: \033[0m')
         if choice == 'x':
             print('\033[33mBye!\033[0m')
+            exit()
         elif choice == '1':
             self.display_users()
         elif choice == '2':

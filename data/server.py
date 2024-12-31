@@ -32,6 +32,10 @@ class Server :
 
     def ban_user(self,ID_banned_users):
         ID_banned_users_draft = ID_banned_users.split(',')
+        for ID in ID_banned_users_draft :
+            if not(ID.strip().isdigit()) or not(int(ID.strip()) in [user.id for user in self.users]):
+                print('\033[33mUnknown option:\033[0m', ID)
+                return
         ID_banned_users = [int(ID.strip()) for ID in ID_banned_users_draft]
         index_banned_users = []
         for index,user in enumerate(self.users) :
@@ -43,9 +47,12 @@ class Server :
         self.save(self.file_path)
     
     def create_channel(self):
-        channel = input('\033[33mName of the new channel\033[0m: ')
-        first_member_id = int(input('\033[33mID of the first user belonging to the new channel: \033[0m'))
-        member_ids = [first_member_id]
+        channel = input('\033[33mName of the new channel : \033[0m')
+        first_member_id = input('\033[33mID of the first user belonging to the new channel: \033[0m')
+        if not(first_member_id.isdigit()) or not(int(first_member_id) in [user.id for user in self.users]):
+            print('\033[33mUnknown option:\033[0m', first_member_id)
+            return
+        member_ids = [int(first_member_id)]
         while True:
             choice = input('\033[33mAdd a member (yes/no) ? : \033[0m')
             if choice == 'no':
@@ -53,10 +60,25 @@ class Server :
             elif choice != 'yes':
                 print('\033[33mUnknown option:\033[0m', choice)
                 continue
-            member_ids.append(int(input('\033[33mID of the next user belonging to the new channel: \033[0m')))
+            other_member_id = input('\033[33mID of the next user belonging to the new channel: \033[0m')
+            if not(other_member_id.isdigit()) or not(int(other_member_id) in [user.id for user in self.users]):
+                print('\033[33mUnknown option:\033[0m', other_member_id)
+                return
+            member_ids.append(int(other_member_id))
         n = max([channel.id for channel in self.channels])+1
         self.channels.append(Channel(n+1,channel,member_ids))
         print('\033[33mThe new channel have successfully been created !\033[0m')
+        self.save(self.file_path)
+
+    def delete_channel(self):
+        ID_channel = input('\033[33mID of the channel to delete : \033[0m')
+        if not(ID_channel.isdigit()) or not(int(ID_channel) in [channel.id for channel in self.channels]):
+            print('\033[33mUnknown option:\033[0m', ID_channel)
+            return
+        for channel in self.channels :
+            if channel.id == ID_channel :
+                self.channels.remove(channel)
+        print('\033[33mThe channel have successfully been deleted !\033[0m')
         self.save(self.file_path)
 
     @staticmethod
