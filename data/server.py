@@ -1,4 +1,4 @@
-import json
+from json import dump,load
 from .user import User
 from .message import Message
 from .channel import Channel
@@ -20,7 +20,7 @@ class Server :
     def save(self,file):
         server_dico = {"users": [user_User.to_dico() for user_User in self.users],"channels": [channel_Channel.to_dico() for channel_Channel in self.channels],"messages": [message_Message.to_dico() for message_Message in self.messages]}
         with open(file, "w") as f:
-            json.dump(server_dico, f)
+            dump(server_dico, f)
     
     def create_user(self,names):
         new_users_names_draft = names.split(',')
@@ -76,7 +76,7 @@ class Server :
             print('\033[33mUnknown option:\033[0m', ID_channel)
             return
         for channel in self.channels :
-            if channel.id == ID_channel :
+            if channel.id == int(ID_channel) :
                 self.channels.remove(channel)
         print('\033[33mThe channel have successfully been deleted !\033[0m')
         self.save(self.file_path)
@@ -84,7 +84,7 @@ class Server :
     @staticmethod
     def load(file):
         with open(file, "r") as f:
-            server_dico = json.load(f)
+            server_dico = load(f)
         server_Server = Server(file,[User.from_dico(user_dico) for user_dico in server_dico['users']],[Channel.from_dico(channel_dico) for channel_dico in server_dico['channels']],[Message.from_dico(message_dico) for message_dico in server_dico['messages']])
         return(server_Server)
     

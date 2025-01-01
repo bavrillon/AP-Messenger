@@ -1,4 +1,3 @@
-import json
 from argparse import ArgumentParser
 from data.client import Client
 from data.server import Server

@@ -1,6 +1,6 @@
-import psutil
+from psutil import Process
 import os
-import time
+from time import sleep
 
 class Client :          #Messenger app
     def __init__(self,server):
@@ -25,11 +25,11 @@ class Client :          #Messenger app
         elif choice == 'b':
             banned_id = input('\033[33mID of the banned users (separators = ,) : \033[0m')
             self.server.ban_user(banned_id)
-            time.sleep(0.8)
+            sleep(0.8)
             self.display_users()
         else:
             print('\033[33mUnknown option:\033[0m', choice)
-            time.sleep(0.8)
+            sleep(0.8)
             self.display_users()
 
     def display_messages(self):
@@ -37,7 +37,7 @@ class Client :          #Messenger app
         channel_ID = input('\033[33mID of the channel: \033[0m')
         if not(channel_ID.strip().isdigit()) or not(int(channel_ID.strip()) in [channel.id for channel in self.server.channels]):
                 print('\033[33mUnknown option:\033[0m', channel_ID)
-                time.sleep(0.8)
+                sleep(0.8)
                 self.display_messages()
         print('\033[31m\nMessages of the channel\n-------')
         for message in self.server.messages :
@@ -52,7 +52,7 @@ class Client :          #Messenger app
             self.main_menu()
         else:
             print('Unknown option:\033[0m', choice)
-            time.sleep(0.8)
+            sleep(0.8)
             self.main_menu()
 
     def display_channels(self):
@@ -64,17 +64,17 @@ class Client :          #Messenger app
         choice = input('Select an option: \033[0m')
         if choice == 'n':
             self.server.create_channel()
-            time.sleep(0.8)
+            sleep(0.8)
             self.display_channels()
         if choice == 'd':
             self.server.delete_channel()
-            time.sleep(0.8)
+            sleep(0.8)
             self.display_channels()
         elif choice == 'x':
             self.main_menu()
         else:
             print('\033[33mUnknown option:\033[0m', choice)
-            time.sleep(0.8)
+            sleep(0.8)
             self.display_channels()
     
     def main_menu(self):
@@ -93,11 +93,11 @@ class Client :          #Messenger app
             self.display_messages()
         else:
             print('\033[33mUnknown option:\033[0m', choice)
-            time.sleep(0.8)
+            sleep(0.8)
             self.main_menu()
     
     def clear_screen(self):
-        if psutil.Process(os.getppid()).name() == 'bash.exe':
+        if Process(os.getppid()).name() == 'bash.exe':
             os.system('clear')
         else :
             os.system('cls' if os.name == 'nt' else 'clear')
