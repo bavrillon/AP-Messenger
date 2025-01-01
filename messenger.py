@@ -1,18 +1,18 @@
 import json
-import argparse
+from argparse import ArgumentParser
 from data.client import Client
 from data.server import Server
 
 def start() :           # Récupération du server (json) utilisé
-    parser = argparse.ArgumentParser()
+    parser = ArgumentParser()
     parser.add_argument('-s','--server', help = 'Enter json server path')
     args = parser.parse_args()
     print(f'Server json : {args.server}')
-    JASON_FILE_NAME = args.server
-    return (JASON_FILE_NAME)
+    jason_file_name = args.server
+    return (jason_file_name)
 
 if __name__ == "__main__":
     JASON_FILE_NAME = start()
-    server = Server.load(JASON_FILE_NAME)
-    client = Client(server)
-    client.main_menu()  
+    SERVER = Server.load(JASON_FILE_NAME)
+    CLIENT = Client(SERVER)
+    CLIENT.main_menu()  
