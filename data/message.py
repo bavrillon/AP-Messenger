@@ -13,7 +13,7 @@ class Message :
         message_dico = {"id": self.id, "reception_date": self.reception_date, "sender_id": self.sender_id, "channel": self.channel, "content": self.content}
         return(message_dico)
     
-    @staticmethod
-    def from_dico(message_dico:dict):
-        message_Message = Message(message_dico['id'],message_dico['reception_date'],message_dico['sender_id'],message_dico['channel'],message_dico['content'])
+    @classmethod
+    def from_dico(cls,message_dico:dict):
+        message_Message = cls(message_dico['id'],message_dico['reception_date'],message_dico['sender_id'],message_dico['channel'],message_dico['content'])
         return(message_Message)

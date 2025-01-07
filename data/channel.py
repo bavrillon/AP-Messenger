@@ -11,7 +11,7 @@ class Channel :
         channel_dico = {"id": self.id, "name": self.name, "member_ids": self.members_ids}
         return(channel_dico)
     
-    @staticmethod
-    def from_dico(channel_dico:dict):
-        channel_Channel = Channel(channel_dico['id'],channel_dico['name'],channel_dico['member_ids'])
+    @classmethod
+    def from_dico(cls,channel_dico:dict):
+        channel_Channel = cls(channel_dico['id'],channel_dico['name'],channel_dico['member_ids'])
         return(channel_Channel)

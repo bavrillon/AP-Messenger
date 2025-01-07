@@ -10,7 +10,7 @@ class User :
         user_dico = {"id": self.id, "name": self.name}
         return(user_dico)
     
-    @staticmethod
-    def from_dico(user_dico:dict):
-        user_User = User(user_dico['id'],user_dico['name'])
+    @classmethod
+    def from_dico(cls,user_dico:dict):
+        user_User = cls(user_dico['id'],user_dico['name'])
         return(user_User)
