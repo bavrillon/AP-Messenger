@@ -1,4 +1,4 @@
-from json import dump,load
+import json
 import requests
 from .user import User
 from .message import Message
@@ -24,10 +24,10 @@ class Server:
     def get_channels(self):
         pass
     
-    def create_channel(self):
+    def create_channel(self, member_ids: list[int]):
         pass
 
-    def delete_channel(self):
+    def delete_channel(self, channel_id: int):
         pass
 
     def get_messages(self,channel: int):
@@ -54,7 +54,7 @@ class LocalServer(Server) :
     def save(self,file):
         server_dico = {"users": [user_User.to_dico() for user_User in self._users],"channels": [channel_Channel.to_dico() for channel_Channel in self._channels],"messages": [message_Message.to_dico() for message_Message in self._messages]}
         with open(file, "w") as f:
-            dump(server_dico, f)
+            json.dump(server_dico, f)
 
     def get_user(self):
         super().get_users()
@@ -90,41 +90,17 @@ class LocalServer(Server) :
         super().get_channels()
         return(self._channels)
 
-    def create_channel(self):
+    def create_channel(self, name: str, member_ids: list[int]):
         super().create_channel()
-        channel = input('\033[33mName of the new channel : \033[0m')
-        first_member_id = input('\033[33mID of the first user belonging to the new channel: \033[0m')
-        if not(first_member_id.isdigit()) or not(int(first_member_id) in [user.id for user in self._users]):
-            print('\033[33mUnknown option:\033[0m', first_member_id)
-            return
-        member_ids = [int(first_member_id)]
-        while True:
-            choice = input('\033[33mAdd a member (yes/no) ? : \033[0m')
-            if choice == 'no':
-                break
-            elif choice != 'yes':
-                print('\033[33mUnknown option:\033[0m', choice)
-                continue
-            other_member_id = input('\033[33mID of the next user belonging to the new channel: \033[0m')
-            if not(other_member_id.isdigit()) or not(int(other_member_id) in [user.id for user in self._users]):
-                print('\033[33mUnknown option:\033[0m', other_member_id)
-                return
-            member_ids.append(int(other_member_id))
         n = max([channel.id for channel in self._channels])+1
-        self._channels.append(Channel(n+1,channel,member_ids))
-        print('\033[33mThe new channel have successfully been created !\033[0m')
+        self._channels.append(Channel(n+1,name,member_ids))
         self.save(self._file_path)
 
-    def delete_channel(self):
+    def delete_channel(self, channel_id: int):
         super().delete_channel()
-        ID_channel = input('\033[33mID of the channel to delete : \033[0m')
-        if not(ID_channel.isdigit()) or not(int(ID_channel) in [channel.id for channel in self._channels]):
-            print('\033[33mUnknown option:\033[0m', ID_channel)
-            return
         for channel in self._channels :
-            if channel.id == int(ID_channel) :
+            if channel.id == channel_id :
                 self._channels.remove(channel)
-        print('\033[33mThe channel have successfully been deleted !\033[0m')
         self.save(self._file_path)
 
     def get_messages(self, ID_channel: int):
@@ -138,7 +114,7 @@ class LocalServer(Server) :
     @classmethod
     def load(cls, file) :
         with open(file, "r") as f:
-            server_dico = load(f)
+            server_dico = json.load(f)
         server_Server = cls(file,[User.from_dico(user_dico) for user_dico in server_dico['users']],[Channel.from_dico(channel_dico) for channel_dico in server_dico['channels']],[Message.from_dico(message_dico) for message_dico in server_dico['messages']])
         return(server_Server)
     
@@ -166,6 +142,15 @@ class RemoteServer :
             users.append(user)
         return(users)
     
+    def create_user(self, names: list[str]):
+        super().create_user()
+        url_creation_user = self.url + '/users/create'
+        for user_name in names :
+            requests.post(url_creation_user, data={name: user_name})
+
+    def ban_user(self, ID_banned_users: list[int]):
+        pass # A implémenter pour un server distant !!
+
     def get_channels(self):
         super().get_channels()
         reponse = requests.get(self.url + '/channels')
@@ -176,6 +161,15 @@ class RemoteServer :
             channels.append(channel)
         return(channels)
     
+    def create_channel(self, channel_name: str, member_ids: list[int]):
+        super().create_channel()
+        url_creation_channel = self.url + '/channels/create'
+        requests.post(url_creation_channel, data={name: channel_name})
+
+    def delete_channel(self, channel_id: int):
+        super().delete_channel()
+        pass
+
     def get_messages(self, ID_channel: int): 
         super().get_messages()
         reponse = requests.get(self.url + '/channels/' + str(ID_channel) + '/messages')

@@ -1,9 +1,10 @@
 from psutil import Process
 import os
 from time import sleep
+from .server import Server
 
 class Client :          #Messenger app
-    def __init__(self,server):
+    def __init__(self,server: Server):   #En réalité, server est une instance de LocalServer ou RemoteServer, qui sont des classes héritant de la classe Server
         self.server = server    #Local server OR Remote server
         
     def __repr__(self):
@@ -62,11 +63,38 @@ class Client :          #Messenger app
         print('\nn. Create channel\nd. Delete channel\nx. Main menu')
         choice = input('Select an option: \033[0m')
         if choice == 'n':
-            self.server.create_channel()
+            channel = input('\033[33mName of the new channel : \033[0m')
+            first_member_id = input('\033[33mID of the first user belonging to the new channel: \033[0m')
+            if not(first_member_id.isdigit()) or not(int(first_member_id) in [user.id for user in self.server._users]):
+                print('\033[33mUnknown option:\033[0m', first_member_id)
+                sleep(0.8)
+                self.display_channels()
+            member_ids = [int(first_member_id)]
+            while True:
+                choice = input('\033[33mAdd a member (yes/no) ? : \033[0m')
+                if choice == 'no':
+                    break
+                elif choice != 'yes':
+                    print('\033[33mUnknown option:\033[0m', choice)
+                    sleep(0.8)
+                    self.display_channels()
+                other_member_id = input('\033[33mID of the next user belonging to the new channel: \033[0m')
+                if not(other_member_id.isdigit()) or not(int(other_member_id) in [user.id for user in self.server._users]):
+                    sleep(0.8)
+                    self.display_channels()
+                member_ids.append(int(other_member_id))
+            self.server.create_channel(channel,member_ids)
+            print('\033[33mThe new channel have successfully been created !\033[0m')
             sleep(0.8)
             self.display_channels()
         if choice == 'd':
-            self.server.delete_channel()
+            ID_channel = input('\033[33mID of the channel to delete : \033[0m')
+            if not(ID_channel.isdigit()) or not(int(ID_channel) in [channel.id for channel in self.server._channels]):
+                print('\033[33mUnknown option:\033[0m', ID_channel)
+                sleep(0.8)
+                self.display_channels()          
+            self.server.delete_channel(int(ID_channel))
+            print('\033[33mThe channel have successfully been deleted !\033[0m')
             sleep(0.8)
             self.display_channels()
         elif choice == 'x':
