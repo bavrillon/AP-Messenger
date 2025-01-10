@@ -13,7 +13,8 @@ class Client :          #Messenger app
     def display_users(self):
         self.clear_screen()
         print('\033[33m\nUser list\n-------')
-        for user in self.server.get_users() :
+        users_list = self.server.get_users()
+        for user in users_list :
             print(user.id,' - ',user.name)
         print('\nn. Create user\nb. Ban user\nx. Main menu')
         choice = input('Select an option: \033[0m')
@@ -36,12 +37,14 @@ class Client :          #Messenger app
     def display_messages(self):
         self.clear_screen()
         channel_ID = input('\033[33mID of the channel: \033[0m')
-        if not(channel_ID.strip().isdigit()) or not(int(channel_ID.strip()) in [channel.id for channel in self.server.get_channels()]):
+        channels_list = self.server.get_channels()
+        if not(channel_ID.strip().isdigit()) or not(int(channel_ID.strip()) in [channel.id for channel in channels_list]):
                 print('\033[33mUnknown option:\033[0m', channel_ID)
                 sleep(0.8)
                 self.display_messages()
         print('\033[31m\nMessages of the channel\n-------')
-        for message in self.server.get_messages(int(channel_ID)):
+        messages_list = self.server.get_messages(int(channel_ID))
+        for message in messages_list:
         #       print(message.id',' -\nReception date : ',message.reception_date,' -\nsender id : ',message.sender_id,'\n',message.content)
                 print(f"{message.id} -\nReception date : {message.reception_date}\nsender id : {message.sender_id}\n{message.content}")
         print('\033[33mo. See another channel\nx. Main menu')
@@ -58,7 +61,8 @@ class Client :          #Messenger app
     def display_channels(self):
         self.clear_screen()
         print('\033[33m\nChannels list\n-------')
-        for channel in self.server.get_channels() :
+        channels_list = self.server.get_channels()
+        for channel in channels_list :
             print(f"{channel.id} - {channel.name} : {channel.members_ids}")
         print('\nn. Create channel\nd. Delete channel\nx. Main menu')
         choice = input('Select an option: \033[0m')

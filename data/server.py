@@ -24,7 +24,7 @@ class Server:
     def get_channels(self):
         pass
     
-    def create_channel(self, member_ids: list[int]):
+    def create_channel(self, name:str, member_ids: list[int]):
         pass
 
     def delete_channel(self, channel_id: int):
@@ -56,12 +56,12 @@ class LocalServer(Server) :
         with open(file, "w") as f:
             json.dump(server_dico, f)
 
-    def get_user(self):
+    def get_users(self):
         super().get_users()
         return(self._users)
     
     def create_user(self, names: list[str]):
-        super().create_user()
+        super().create_user(names)
         new_users_names_draft = names.split(',')
         new_users_names = [name.strip() for name in new_users_names_draft]
         for name_user in new_users_names :
@@ -70,7 +70,7 @@ class LocalServer(Server) :
         self.save(self._file_path)
 
     def ban_user(self, ID_banned_users: list[int]):
-        super().ban_user()
+        super().ban_user(ID_banned_users)
         ID_banned_users_draft = ID_banned_users.split(',')
         for ID in ID_banned_users_draft :
             if not(ID.strip().isdigit()) or not(int(ID.strip()) in [user.id for user in self._users]):
@@ -91,20 +91,20 @@ class LocalServer(Server) :
         return(self._channels)
 
     def create_channel(self, name: str, member_ids: list[int]):
-        super().create_channel()
+        super().create_channel(name, member_ids)
         n = max([channel.id for channel in self._channels])+1
         self._channels.append(Channel(n+1,name,member_ids))
         self.save(self._file_path)
 
     def delete_channel(self, channel_id: int):
-        super().delete_channel()
+        super().delete_channel(channel_id)
         for channel in self._channels :
             if channel.id == channel_id :
                 self._channels.remove(channel)
         self.save(self._file_path)
 
     def get_messages(self, ID_channel: int):
-        super().get_messages()
+        super().get_messages(ID_channel)
         messages = []
         for message in self._messages :
             if message.channel == ID_channel :
@@ -123,7 +123,7 @@ class LocalServer(Server) :
         server_Server = LocalServer([User.from_dico(user_dico) for user_dico in server_dico['users']],[Channel.from_dico(channel_dico) for channel_dico in server_dico['channels']],[Message.from_dico(message_dico) for message_dico in server_dico['messages']])
         return(server_Server)
 
-class RemoteServer :
+class RemoteServer(Server) :
     def __init__(self,url:'str'):
         super().__init__()
         self._url = url
@@ -134,7 +134,7 @@ class RemoteServer :
     
     def get_users(self):
         super().get_users()
-        reponse = requests.get(self.url + '/users')
+        reponse = requests.get(self._url + '/users')
         list_users = reponse.json()       #Retourne la liste des dictionnaires que sont les users
         users = []                        #Liste d'instances de la classe User
         for user_dico in list_users :
@@ -143,17 +143,17 @@ class RemoteServer :
         return(users)
     
     def create_user(self, names: list[str]):
-        super().create_user()
-        url_creation_user = self.url + '/users/create'
+        super().create_user(names)
+        url_creation_user = self._url + '/users/create'
         for user_name in names :
-            requests.post(url_creation_user, data={name: user_name})
+            requests.post(url_creation_user, data=user_name)
 
     def ban_user(self, ID_banned_users: list[int]):
         pass # A implémenter pour un server distant !!
 
     def get_channels(self):
         super().get_channels()
-        reponse = requests.get(self.url + '/channels')
+        reponse = requests.get(self._url + '/channels')
         list_channels = reponse.json()       #Retourne la liste des dictionnaires que sont les channels
         channels = []                        #Liste d'instances de la classe Channel
         for channel_dico in list_channels :
@@ -162,17 +162,17 @@ class RemoteServer :
         return(channels)
     
     def create_channel(self, channel_name: str, member_ids: list[int]):
-        super().create_channel()
-        url_creation_channel = self.url + '/channels/create'
-        requests.post(url_creation_channel, data={name: channel_name})
+        super().create_channel(channel_name, member_ids)
+        url_creation_channel = self._url + '/channels/create'
+        requests.post(url_creation_channel, data=channel_name)
 
     def delete_channel(self, channel_id: int):
-        super().delete_channel()
+        super().delete_channel(channel_id)
         pass
 
     def get_messages(self, ID_channel: int): 
-        super().get_messages()
-        reponse = requests.get(self.url + '/channels/' + str(ID_channel) + '/messages')
+        super().get_messages(ID_channel)
+        reponse = requests.get(self._url + '/channels/' + str(ID_channel) + '/messages')
         list_messages = reponse.json()       #Retourne la liste des dictionnaires que sont les messages
         messages = []                        #Liste d'instances de la classe Message
         for message_dico in list_messages :
