@@ -1,5 +1,5 @@
 class Channel :
-    def __init__(self,id:int,name:str,members_ids:list):
+    def __init__(self,id:int,name:str,members_ids:list[int]):
         self.id = id
         self.name = name
         self.members_ids = members_ids

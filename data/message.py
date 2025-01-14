@@ -9,11 +9,11 @@ class Message :
     def __repr__(self):
         return(f'Message(id={self.id},reception_date={self.reception_date},sender_id={self.sender_id},channel={self.channel},content={self.content})')
     
-    def to_dico(self):
+    def to_dico(self) -> dict:
         message_dico = {"id": self.id, "reception_date": self.reception_date, "sender_id": self.sender_id, "channel": self.channel, "content": self.content}
         return(message_dico)
     
     @classmethod
-    def from_dico(cls,message_dico:dict):
+    def from_dico(cls,message_dico:dict) :
         message_Message = cls(message_dico['id'],message_dico['reception_date'],message_dico['sender_id'],message_dico['channel'],message_dico['content'])
         return(message_Message)

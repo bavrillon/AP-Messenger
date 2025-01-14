@@ -1,5 +1,8 @@
 import json
 import requests
+import time
+from datetime import datetime
+
 from .user import User
 from .message import Message
 from .channel import Channel
@@ -12,25 +15,28 @@ class Server:
     def __repr__(self):
         pass
 
-    def get_users(self):
+    def get_users(self) -> list[User]:
         pass
     
-    def create_user(self, names: list[str]):
+    def create_user(self, names: list[str]) -> User:
         pass
 
     def ban_user(self, ID_banned_users: list[int]):
         pass
     
-    def get_channels(self):
+    def get_channels(self) -> list[Channel]:
         pass
     
-    def create_channel(self, name:str, member_ids: list[int]):
+    def create_channel(self, name:str, member_ids: list[int]) -> Channel:
         pass
 
     def delete_channel(self, channel_id: int):
         pass
 
-    def get_messages(self,channel: int):
+    def get_messages(self, channel: int) -> list[Message]:
+        pass
+
+    def send_message(self, sender: int, channel: int, content: str):
         pass
 
 
@@ -47,7 +53,7 @@ class LocalServer(Server) :
         super().__repr__()
         return(f'Local server(users={self._users},channels={self._channels},messages={self._messages})')
 
-    def to_dico(self) ->dict:
+    def to_dico(self)->dict:
         server_dico = {"users": [user_User.to_dico() for user_User in self._users],"channels": [channel_Channel.to_dico() for channel_Channel in self._channels],"messages": [message_Message.to_dico() for message_Message in self._messages]}
         return(server_dico)
     
@@ -62,8 +68,7 @@ class LocalServer(Server) :
     
     def create_user(self, names: list[str]):
         super().create_user(names)
-        new_users_names_draft = names.split(',')
-        new_users_names = [name.strip() for name in new_users_names_draft]
+        new_users_names = [name.strip() for name in names]
         for name_user in new_users_names :
             n = max([user.id for user in self._users])+1
             self._users.append(User(n,name_user))
@@ -71,18 +76,16 @@ class LocalServer(Server) :
 
     def ban_user(self, ID_banned_users: list[int]):
         super().ban_user(ID_banned_users)
-        ID_banned_users_draft = ID_banned_users.split(',')
-        for ID in ID_banned_users_draft :
-            if not(ID.strip().isdigit()) or not(int(ID.strip()) in [user.id for user in self._users]):
-                print('\033[33mUnknown option:\033[0m', ID)
-                return
-        ID_banned_users = [int(ID.strip()) for ID in ID_banned_users_draft]
         index_banned_users = []
         for index,user in enumerate(self._users) :
             if user.id in ID_banned_users :
                 index_banned_users.append(index)
         index_banned_users.sort(reverse=True)
-        for index in index_banned_users:
+        for index in index_banned_users:                # On supprime l'utilisateur banni de toutes les channels
+            for channel in self._channels :
+                for ID in channel.members_ids :
+                    if ID == self._users[index].id :
+                        channel.members_ids.remove(ID)
             self._users.pop(index)
         self.save(self._file_path)
     
@@ -110,6 +113,14 @@ class LocalServer(Server) :
             if message.channel == ID_channel :
                 messages.append(message)
         return(messages)
+    
+    def send_message(self, sender_id: int, channel: int, content: str):
+        super().send_message(sender_id, channel, content)
+        id = max([message.id for message in self._messages])+1
+        reception_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        message = Message(id,reception_date,sender_id,channel,content)
+        self._messages.append(message)
+        self.save(self._file_path)
 
     @classmethod
     def load(cls, file) :
@@ -146,7 +157,7 @@ class RemoteServer(Server) :
         super().create_user(names)
         url_creation_user = self._url + '/users/create'
         for user_name in names :
-            requests.post(url_creation_user, data=user_name)
+            requests.post(url_creation_user, json={'name' : user_name})
 
     def ban_user(self, ID_banned_users: list[int]):
         pass # A implémenter pour un server distant !!
@@ -156,7 +167,13 @@ class RemoteServer(Server) :
         reponse = requests.get(self._url + '/channels')
         list_channels = reponse.json()       #Retourne la liste des dictionnaires que sont les channels
         channels = []                        #Liste d'instances de la classe Channel
-        for channel_dico in list_channels :
+        for channel_dico_draft in list_channels :
+            channel_dico = channel_dico_draft
+            members_ids = []
+            reponse = requests.get(self._url + '/channels/'+ str(channel_dico_draft['id']) + '/members').json() # Retourne la liste des dictionnaires que sont les membres
+            for member in reponse :
+                members_ids.append(member['id'])            
+            channel_dico['member_ids'] = members_ids
             channel = Channel.from_dico(channel_dico)
             channels.append(channel)
         return(channels)
@@ -164,7 +181,11 @@ class RemoteServer(Server) :
     def create_channel(self, channel_name: str, member_ids: list[int]):
         super().create_channel(channel_name, member_ids)
         url_creation_channel = self._url + '/channels/create'
-        requests.post(url_creation_channel, data=channel_name)
+        response = requests.post(url_creation_channel, json={'name': channel_name}).json() # Retourne un dictionnaire
+        id_channel = response['id']
+        url_join_channel = self._url + '/channels/' + str(id_channel) + '/join'
+        for user_id in member_ids :
+            requests.post(url_join_channel, json={'user_id': user_id})
 
     def delete_channel(self, channel_id: int):
         super().delete_channel(channel_id)
@@ -176,6 +197,13 @@ class RemoteServer(Server) :
         list_messages = reponse.json()       #Retourne la liste des dictionnaires que sont les messages
         messages = []                        #Liste d'instances de la classe Message
         for message_dico in list_messages :
+            message_dico['channel'] = message_dico['channel_id']
+            del message_dico['channel_id']
             message = Message.from_dico(message_dico)
             messages.append(message)
         return(messages)
+    
+    def send_message(self, sender_id: int, channel: int, content: str):
+        super().send_message(sender_id, channel, content)
+        url_send_message = self._url + '/channels/' + str(channel) + '/messages/post'
+        requests.post(url_send_message, json={'sender_id': sender_id, 'content':content})

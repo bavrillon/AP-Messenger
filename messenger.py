@@ -1,8 +1,9 @@
 from argparse import ArgumentParser
+from time import sleep
+
 from data.client import Client
 from data.server import LocalServer
 from data.server import RemoteServer
-from time import sleep
 
 
 def initialisation_server() :           # Récupération du server (json) utilisé et conversion en instance de Server
