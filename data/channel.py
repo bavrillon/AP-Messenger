@@ -7,7 +7,7 @@ class Channel :
     def __repr__(self):
         return(f'Channel(id={self.id},name={self.name},members_ids={self.members_ids})')
   
-    def to_dico(self):
+    def to_dico(self) -> dict:
         channel_dico = {"id": self.id, "name": self.name, "member_ids": self.members_ids}
         return(channel_dico)
     

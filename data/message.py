@@ -14,6 +14,6 @@ class Message :
         return(message_dico)
     
     @classmethod
-    def from_dico(cls,message_dico:dict) :
+    def from_dico(cls,message_dico:dict):
         message_Message = cls(message_dico['id'],message_dico['reception_date'],message_dico['sender_id'],message_dico['channel'],message_dico['content'])
         return(message_Message)
