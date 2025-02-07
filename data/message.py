@@ -1,6 +1,8 @@
 class Message :
-    def __init__(self,id:int,reception_date:str,sender_id:str,channel:str,content:str):
+    # Des int sont plus cohérents avec les types de User.id et Channel.id
+    def __init__(self,id:int,reception_date:str,sender_id:int,channel:int,content:str):
         self.id = id
+        # Il vaut mieux stocker les dates sous le type datetime, et les convertir en str lorsque vous souhaitez les afficher
         self.reception_date = reception_date
         self.sender_id = sender_id
         self.channel = channel
